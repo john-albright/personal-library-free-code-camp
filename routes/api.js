@@ -53,8 +53,8 @@ module.exports = function (app) {
         if (error | !data) return res.json('no book exists');
 
         // If successful response will be 'complete delete successful'
-        console.log(data);
-        return res.json('delete successful');
+        //console.log(data);
+        return res.json('complete delete successful');
 
       });
     });
@@ -63,7 +63,7 @@ module.exports = function (app) {
 
   app.route('/api/books/:id')
     .get(function (req, res) {
-      let bookid = req.params.id;
+      let bookid = req.params.id || req.query.id;
 
       // Make sure the id is a valid object id
       try {
@@ -91,7 +91,7 @@ module.exports = function (app) {
       let bookid = req.params.id;
       let comment = req.body.comment || req.query.comment;
 
-      console.log(comment, !comment);
+      //console.log(comment);
 
       if (!comment) return res.json('missing required field comment');
 
@@ -136,13 +136,14 @@ module.exports = function (app) {
     })
     
     .delete(function(req, res) {
-      let bookid = req.params.id;
+      let bookid = req.params.id || req.query.id;
+      //console.log(bookid);
 
       Book.deleteOne({ _id: bookid }, (error, data) => {
-        if (error) return res.json('complete delete unsuccessful');
+        if (error) return res.json('no book exists');
 
         // If successful response will be 'delete successful'
-        return res.json('complete delete successful');
+        return res.json('delete successful');
       });
     });
   

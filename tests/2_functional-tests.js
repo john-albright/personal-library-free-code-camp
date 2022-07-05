@@ -11,7 +11,7 @@ const chai = require('chai');
 const assert = chai.assert;
 const server = require('../server');
 const Book = require('../models/books.js');
-const { afterEach, after, before } = require('mocha');
+const { after, before } = require('mocha');
 
 
 chai.use(chaiHttp);
@@ -59,16 +59,11 @@ suite('Functional Tests', function() {
     });
   });
 
-  /* after(function() {
+  after(function() {
     Book.deleteMany({ '_id': { $in: [idForPost, idForPost2] } }, (err, data) => {
       if (err) return console.log(err);
       //console.log(data);
     });
-  });*/
-
-  afterEach(function() {
-    console.log(idForPost);
-    console.log(idForPost2);
   });
 
   suite('Routing tests', function() {
@@ -86,9 +81,7 @@ suite('Functional Tests', function() {
           .end((err, res) => {
             assert.equal(res.status, 200, 'Response status should be 200');
             assert.equal(res.type, 'application/json', 'Response should be of type json');
-            //assert.isArray(res.body, 'response should be an array');
             assert.equal(res.body.title, 'Don Quixote');
-            //console.log("CHECK ", res.body);
             idForPost = res.body._id; // Save id of the successful post to be used later
             done();
           });
@@ -118,7 +111,7 @@ suite('Functional Tests', function() {
           .get('/api/books')
           .end((err, res) => {
             assert.equal(res.status, 200, 'Response status should be 200');
-            //assert.isArray(res.body, 'response should be an array');
+            assert.isArray(res.body, 'response should be an array');
             assert.equal(res.type, 'application/json', 'Response should be of type json');
             done();
           });
@@ -132,14 +125,11 @@ suite('Functional Tests', function() {
       test('Test GET /api/books/[id] with id not in db',  function(done) {
         chai
         .request(server)
-        .get('/api/books')
-        .send({
-          id: 12345
-        })
+        .get('/api/books/12345')
         .end((err, res) => {
           assert.equal(res.status, 200, 'Response status should be 200');
           assert.equal(res.type, 'application/json', 'Response should be of type json');
-          //assert.isArray(res.body, 'response should be an array');
+          assert.equal(res.body, 'no book exists');
           done();
         });
       });
@@ -147,17 +137,13 @@ suite('Functional Tests', function() {
       test('Test GET /api/books/[id] with valid id in db',  function(done) {
         chai
         .request(server)
-        .get(`/api/books`)
-        .send({
-          id: idForPost
-        })
+        .get(`/api/books/${idForPost}`)
         .end((err, res) => {
           assert.equal(res.status, 200, 'Response status should be 200');
           assert.equal(res.type, 'application/json', 'Response should be of type json');
           assert.equal(res.body.title, "Don Quixote", 'The title should be Don Quixote.');
+          assert.isArray(res.body.comments, 'The comments should be of type array');
           assert.equal(res.body._id, idForPost);
-          console.log(idForPost);
-          assert.isArray(res.body.comments);
           done();
         });
       });
@@ -170,17 +156,16 @@ suite('Functional Tests', function() {
       test('Test POST /api/books/[id] with comment', function(done) {
         chai
         .request(server)
-        .post(`/api/books`)
+        .post(`/api/books/${idForPost}`)
         .send({
-          id: idForPost,
           comment: 'el mejor libro literario jamás escrito'
         })
         .end((err, res) => {
           assert.equal(res.status, 200, 'Response status should be 200');
           assert.equal(res.type, 'application/json', 'Response should be of type json');
-          assert.equal(res.body._id, idForPost);
           assert.equal(res.body.title, 'Don Quixote');
           assert.equal(res.body.comments[0], 'el mejor libro literario jamás escrito');
+          assert.equal(res.body._id, idForPost);
           done();
         });
       });
@@ -200,9 +185,8 @@ suite('Functional Tests', function() {
       test('Test POST /api/books/[id] with comment, id not in db', function(done) {
         chai
         .request(server)
-        .post('/api/books')
+        .post('/api/books/12345')
         .send({
-          id: 12345,
           comment: 'This is a boring book.'
         })
         .end((err, res) => {
@@ -220,14 +204,11 @@ suite('Functional Tests', function() {
       test('Test DELETE /api/books/[id] with valid id in db', function(done) {
         chai
         .request(server)
-        .delete('/api/books')
-        .send({
-          id: idForPost
-        })
+        .delete(`/api/books/${idForPost}`)
         .end((err, res) => {
           assert.equal(res.status, 200, 'Response status should be 200');
           assert.equal(res.type, 'application/json', 'Response should be of type json');
-          assert.equal(res.body.title, 'delete successful');
+          assert.equal(res.body, 'delete successful');
           done(); 
         });
       });
@@ -235,13 +216,10 @@ suite('Functional Tests', function() {
       test('Test DELETE /api/books/[id] with id not in db', function(done) {
         chai
         .request(server)
-        .delete('/api/books')
-        .send({
-          id: 12345
-        })
+        .delete('/api/books/12345')
         .end((err, res) => {
           assert.equal(res.status, 200, 'Response status should be 200');
-          assert.equal(res.type, 'text', 'Response should be of type text');
+          assert.equal(res.type, 'application/json', 'Response should be of type json');
           assert.equal(res.body, 'no book exists');
           done();
         });
