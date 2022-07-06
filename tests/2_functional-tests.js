@@ -95,7 +95,7 @@ suite('Functional Tests', function() {
           .end((err, res) => {
             assert.equal(res.status, 200, 'Response status should be 200');
             assert.equal(res.type, 'application/json', 'Response should be of type json');
-            assert.equal(res.body, 'missing required book title');
+            assert.equal(res.body, 'missing required field title');
             done();
           });
       });

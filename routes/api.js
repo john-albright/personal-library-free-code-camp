@@ -19,7 +19,7 @@ module.exports = function (app) {
       Book.find({}, (error, data) => {
         if (error) return res.json("error");
       
-        // response will be array of book objects
+        // Response will be array of book objects
         // json res format: [{"_id": bookid, "title": book_title, "commentcount": num_of_comments },...]  
         return res.json(data);
       });
@@ -33,7 +33,7 @@ module.exports = function (app) {
       });
 
       newBook.save((error, data) => {
-        if (error | !data) return res.json('missing required book title');
+        if (error | !data) return res.json('missing required field title');
 
         //console.log(data);
 
@@ -140,7 +140,7 @@ module.exports = function (app) {
       //console.log(bookid);
 
       Book.deleteOne({ _id: bookid }, (error, data) => {
-        if (error) return res.json('no book exists');
+        if (error | !data) return res.json('no book exists');
 
         // If successful response will be 'delete successful'
         return res.json('delete successful');
