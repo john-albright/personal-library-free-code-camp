@@ -139,8 +139,14 @@ module.exports = function (app) {
       let bookid = req.params.id || req.query.id;
       //console.log(bookid);
 
+      try {
+        mongoose.Types.ObjectId(bookid);
+      } catch (error) {
+        return res.json('no book exists');
+      }
+
       Book.deleteOne({ _id: bookid }, (error, data) => {
-        if (error | !data) return res.json('no book exists');
+        if (error || data.deletedCount == 0) return res.json('no book exists');
 
         // If successful response will be 'delete successful'
         return res.json('delete successful');

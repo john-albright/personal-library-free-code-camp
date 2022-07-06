@@ -216,7 +216,7 @@ suite('Functional Tests', function() {
       test('Test DELETE /api/books/[id] with id not in db', function(done) {
         chai
         .request(server)
-        .delete('/api/books/12345')
+        .delete('/api/books/5f665eb46e296f6b9b6a504d')
         .end((err, res) => {
           assert.equal(res.status, 200, 'Response status should be 200');
           assert.equal(res.type, 'application/json', 'Response should be of type json');
